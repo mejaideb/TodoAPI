@@ -4,12 +4,15 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -23,13 +26,13 @@ public class TodoRestController {
 	private TodoDao todoDao;
 	
 	@GetMapping(path="/todo")
-	public List<ToDoList> retrieveListOfTodoItems(){
-		return todoDao.ListOfItems();
+	public List<TodoItem> retrieveListOfTodoItems(){
+		return todoDao.findAll();
 	}
 	
 	@GetMapping(path="/todo/{id}")
-	public ToDoList getItemById(@PathVariable int id){
-		ToDoList item= todoDao.findAnItem(id);
+	public TodoItem getItemById(@PathVariable int id){
+		TodoItem item= todoDao.findAnItem(id);
 		if(item==null)
 			throw new UserNotFoundException("id-" +id);
 		return item;
@@ -37,17 +40,26 @@ public class TodoRestController {
 	}
 	
 	@PostMapping("/todo")
-	public ResponseEntity<Object> createNewItem(@RequestBody ToDoList item) {
-		ToDoList savedItem=todoDao.save(item);
+	public ResponseEntity<?> createNewItem(@RequestBody TodoItem item) {
+		TodoItem savedItem=todoDao.save(item);
 		
-		URI location= ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").
-				buildAndExpand(savedItem.getId()).toUri();
-		return ResponseEntity.created(location).build();
+//		URI location= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+//				.buildAndExpand(savedItem.getId()).toUri();
+//		
+		return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
+		
+//		return ResponseEntity.created(location).build();
 	}
 	
 	@DeleteMapping("/todo/{id}")
 	public void deleteItem(@PathVariable int id){
-		ToDoList item= todoDao.deleteById(id);
-	}
 		
+		todoDao.deleteById(id);
+	}
+	
+	@PutMapping("/todo/{itemId}")
+	public void updateById(@PathVariable int itemId, @RequestBody TodoItem item) {
+		item.setId(itemId);
+		todoDao.updateItem(item);
+	}
 }

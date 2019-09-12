@@ -1,7 +1,14 @@
 package com.tavisca.workshops.todolist.com.tavisca.workshops.todolist;
 
-public class ToDoList {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+@Entity
+public class TodoItem {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
 	private String details;
@@ -27,14 +34,16 @@ public class ToDoList {
 	public String toString() {
 		return "ToDoList [id=" + id + ", name=" + name + ", details=" + details + "]";
 	}
-	public ToDoList(Integer id, String name, String details) {
+	public TodoItem(Integer id, String name, String details) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.details = details;
 	}
 	
-	
+	public TodoItem() {
+		
+	}
 	
 
 }
